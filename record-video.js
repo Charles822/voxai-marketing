@@ -4,10 +4,9 @@ const path = require('path');
 (async () => {
   console.log('🎬 Starting video recording...');
   
-  // Launch browser with video recording
   const browser = await chromium.launch();
   const context = await browser.newContext({
-    viewport: { width: 540, height: 960 }, // 9:16 ratio
+    viewport: { width: 540, height: 960 },
     recordVideo: {
       dir: 'videos/',
       size: { width: 540, height: 960 },
@@ -16,27 +15,31 @@ const path = require('path');
 
   const page = await context.newPage();
 
-  // Build and serve the app
-  console.log('📦 Building app...');
-  
-  // Navigate to the app (assuming it's built)
-  const filePath = path.join(__dirname, 'src', 'app', 'page.tsx');
-  
-  // Create a simple HTML file for testing
+  // HTML with CORRECT voxGreen colors
   const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --voxGreen-50: #f3faf8;
+      --voxGreen-100: #d7f0ed;
+      --voxGreen-300: #7fc9c2;
+      --voxGreen-500: #3b918d;
+      --voxGreen-800: #234c4c;
+      --voxGreen-850: #1d4545;
+      --voxGreen-925: #132A2A;
+      --voxGreen-950: #0e2324;
+    }
     body {
       width: 540px;
       height: 960px;
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+      background: linear-gradient(180deg, var(--voxGreen-950) 0%, var(--voxGreen-925) 50%, var(--voxGreen-950) 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
     }
     .container {
@@ -47,67 +50,176 @@ const path = require('path');
       justify-content: center;
       align-items: center;
       padding: 40px 24px;
+      position: relative;
     }
-    .phase {
-      text-align: center;
+    
+    /* Brand Header */
+    .brand-header {
+      position: absolute;
+      top: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(59, 145, 141, 0.15);
+      border: 1px solid var(--voxGreen-800);
+      border-radius: 20px;
+      padding: 8px 16px;
     }
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--voxGreen-500);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--voxGreen-500);
+    }
+    .brand-text {
+      color: var(--voxGreen-500);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    
+    /* Phase styles */
+    .phase { text-align: center; width: 100%; }
+    
     .label {
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--voxGreen-300);
       font-size: 14px;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
+    
+    .input-box {
+      background: var(--voxGreen-850);
+      border: 1px solid var(--voxGreen-800);
+      border-radius: 12px;
+      padding: 24px 32px;
+      min-width: 280px;
+      display: inline-block;
+    }
+    
     .simple-text {
-      color: #ffffff;
-      font-size: 32px;
-      font-weight: 600;
+      color: var(--voxGreen-100);
+      font-size: 28px;
+      font-weight: 500;
+      font-style: italic;
+      margin: 0;
     }
+    
     .card {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--voxGreen-850);
+      border: 1px solid var(--voxGreen-800);
       border-radius: 16px;
-      padding: 24px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      width: 100%;
+      padding: 28px;
+      box-shadow: 0 0 0 1px var(--voxGreen-800), 0 20px 40px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+      text-align: left;
     }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--voxGreen-500), transparent);
+      opacity: 0.6;
+    }
+    
     .typing-text {
-      color: #ffffff;
-      font-size: 18px;
-      line-height: 1.6;
+      color: var(--voxGreen-100);
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.7;
+      margin: 0;
       min-height: 200px;
     }
+    
     .cursor {
-      color: #60a5fa;
+      color: var(--voxGreen-500);
       animation: blink 1s infinite;
     }
+    
     @keyframes blink {
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0; }
     }
+    
     .badge {
-      display: inline-block;
-      background: rgba(96, 165, 250, 0.2);
-      color: #60a5fa;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 145, 141, 0.2);
+      color: var(--voxGreen-500);
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(59, 145, 141, 0.4);
+      box-shadow: 0 0 20px rgba(59, 145, 141, 0.4);
+      margin-top: 28px;
+      opacity: 0;
+      transition: opacity 0.5s;
     }
+    
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      border-top: 3px solid #ffffff;
+      width: 60px;
+      height: 60px;
+      border: 3px solid var(--voxGreen-800);
+      border-top: 3px solid var(--voxGreen-500);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(59, 145, 141, 0.4);
+      margin: 0 auto 24px;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    .enhancing-text {
+      color: var(--voxGreen-500);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    
+    .bottom-brand {
+      position: absolute;
+      bottom: 50px;
+      color: var(--voxGreen-300);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    
+    .waiting {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 40px;
+      color: var(--voxGreen-300);
+      font-size: 12px;
+    }
+    
+    .waiting-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--voxGreen-800);
+      border-top: 2px solid var(--voxGreen-500);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
     #phase1 { display: block; }
     #phase2 { display: none; }
     #phase3 { display: none; }
@@ -115,26 +227,44 @@ const path = require('path');
 </head>
 <body>
   <div class="container">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand-dot"></div>
+      <span class="brand-text">VoxAI Prompt Enhancer</span>
+    </div>
+    
     <!-- Phase 1: Simple prompt -->
     <div id="phase1" class="phase">
       <p class="label">Basic Prompt</p>
-      <h2 class="simple-text">"a plumber"</h2>
+      <div class="input-box">
+        <h2 class="simple-text">"a plumber"</h2>
+      </div>
+      <div class="waiting">
+        <div class="waiting-spinner"></div>
+        Enhancing...
+      </div>
     </div>
     
     <!-- Phase 2: Enhancing -->
     <div id="phase2" class="phase">
       <div class="spinner"></div>
-      <p style="color: #ffffff; font-size: 18px;">Enhancing prompt...</p>
+      <p class="enhancing-text">Enhancing with AI...</p>
     </div>
     
     <!-- Phase 3: Typing -->
-    <div id="phase3" class="phase" style="width: 100%;">
-      <p class="label">Enhanced Prompt</p>
+    <div id="phase3" class="phase">
+      <p style="color: #3b918d; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; font-weight: 600;">Enhanced Prompt</p>
       <div class="card">
         <p class="typing-text"><span id="typed-text"></span><span class="cursor">|</span></p>
       </div>
-      <div id="badge" class="badge" style="opacity: 0; transition: opacity 0.5s;">✨ Prompt Enhanced</div>
+      <div id="badge" class="badge">
+        <span style="font-size: 14px;">✨</span>
+        Prompt Enhanced
+      </div>
     </div>
+    
+    <!-- Bottom Brand -->
+    <div id="bottom-brand" class="bottom-brand">Powered by VoxAI</div>
   </div>
 
   <script>
@@ -160,12 +290,13 @@ const path = require('path');
             index++;
           } else {
             clearInterval(typeInterval);
-            // Show badge
+            // Show badge and bottom brand
             setTimeout(() => {
               document.getElementById('badge').style.opacity = '1';
+              document.getElementById('bottom-brand').style.opacity = '1';
             }, 300);
           }
-        }, 25); // 25ms per character
+        }, 30);
         
       }, 800);
     }, 2000);
@@ -176,19 +307,14 @@ const path = require('path');
   
   require('fs').writeFileSync('record-temp.html', htmlContent);
   
-  // Navigate to the page
   await page.goto('file://' + path.join(__dirname, 'record-temp.html'));
   
-  // Wait for animation to complete
-  // 2s (phase 1) + 0.8s (phase 2) + (330 chars * 25ms = 8.25s) + 1s buffer = ~12s
   console.log('⏱️  Recording animation (12 seconds)...');
   await page.waitForTimeout(12000);
   
-  // Close context to save video
   await context.close();
   await browser.close();
   
-  // Find the video file
   const fs = require('fs');
   const videoDir = 'videos/';
   const files = fs.readdirSync(videoDir);
@@ -198,15 +324,10 @@ const path = require('path');
     const oldPath = path.join(videoDir, videoFile);
     const newPath = path.join(__dirname, 'prompt-enhancement.webm');
     fs.renameSync(oldPath, newPath);
-    
-    // Clean up temp files
     fs.unlinkSync('record-temp.html');
     fs.rmdirSync(videoDir);
     
     console.log('✅ Video saved: prompt-enhancement.webm');
     console.log('📁 Location: ' + newPath);
-    console.log('');
-    console.log('📝 To convert to MP4, run:');
-    console.log('   ffmpeg -i prompt-enhancement.webm -c:v libx264 -c:a aac prompt-enhancement.mp4');
   }
 })();
