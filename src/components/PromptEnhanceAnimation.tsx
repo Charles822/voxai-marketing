@@ -9,30 +9,48 @@ interface PromptEnhanceAnimationProps {
   typingSpeed?: number;
 }
 
-// VoxAI Brand Colors
+// VoxAI Brand Colors from Tailwind Config
 const COLORS = {
-  // Background
-  bgDark: "#1a1d21",        // Main dark background
-  bgCard: "#262626",        // Card background
-  bgInput: "#353a3d",       // Input/card surface
-  
-  // Borders
-  border: "#3f3f3f",        // Border gray
-  borderHover: "#40c5cd",   // Cyan accent border
-  
-  // Text
-  textPrimary: "#ffffff",   // White text
-  textSecondary: "#dedede", // Light gray text
-  textMuted: "#898989",     // Muted text
-  
-  // Accent
-  cyan: "#40c5cd",          // Primary cyan accent
-  cyanGlow: "rgba(64, 197, 205, 0.3)", // Cyan glow
-  gold: "#FFD700",          // Yellow/Gold for credits
-  
-  // Gradients
-  gradientStart: "#1a1d21",
-  gradientEnd: "#262626",
+  // voxGreen palette (primary brand color)
+  voxGreen: {
+    50: '#f3faf8',
+    100: '#d7f0ed',
+    200: '#afe0d9',
+    300: '#7fc9c2',
+    400: '#55aca7',
+    500: '#3b918d',  // PRIMARY BRAND COLOR
+    600: '#2d7472',
+    700: '#285d5d',
+    800: '#234c4c',
+    850: '#1d4545',
+    875: '#1e4444',
+    900: '#214040',
+    925: '#132A2A',
+    950: '#0e2324',
+  },
+  // voxOrange (secondary)
+  voxOrange: {
+    500: '#ed5d1f',
+    400: '#f18046',
+  },
+  // Footer colors
+  footer: {
+    1: '#070f13',
+    2: '#0c191d',
+    text: '#b6e8f3',
+  },
+  // Derived
+  bgDark: '#0e2324',      // voxGreen-950
+  bgCard: '#132A2A',      // voxGreen-925
+  bgInput: '#1d4545',     // voxGreen-850
+  border: '#234c4c',      // voxGreen-800
+  borderHover: '#3b918d', // voxGreen-500
+  textPrimary: '#f3faf8', // voxGreen-50
+  textSecondary: '#d7f0ed', // voxGreen-100
+  textMuted: '#7fc9c2',   // voxGreen-300
+  accent: '#3b918d',      // voxGreen-500
+  accentGlow: 'rgba(59, 145, 141, 0.4)',
+  orange: '#ed5d1f',      // voxOrange-500
 };
 
 export default function PromptEnhanceAnimation({
@@ -90,7 +108,7 @@ export default function PromptEnhanceAnimation({
         width: "100%",
         maxWidth: "540px",
         aspectRatio: "9/16",
-        background: `linear-gradient(180deg, ${COLORS.bgDark} 0%, ${COLORS.gradientEnd} 100%)`,
+        background: `linear-gradient(180deg, ${COLORS.bgDark} 0%, ${COLORS.bgCard} 50%, ${COLORS.bgDark} 100%)`,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -116,7 +134,7 @@ export default function PromptEnhanceAnimation({
             display: "inline-flex",
             alignItems: "center",
             gap: "8px",
-            background: `rgba(64, 197, 205, 0.1)`,
+            background: `rgba(59, 145, 141, 0.15)`,
             border: `1px solid ${COLORS.border}`,
             borderRadius: "20px",
             padding: "8px 16px",
@@ -126,14 +144,14 @@ export default function PromptEnhanceAnimation({
             style={{
               width: "8px",
               height: "8px",
-              background: COLORS.cyan,
+              background: COLORS.accent,
               borderRadius: "50%",
-              boxShadow: `0 0 10px ${COLORS.cyan}`,
+              boxShadow: `0 0 10px ${COLORS.accent}`,
             }}
           />
           <span
             style={{
-              color: COLORS.cyan,
+              color: COLORS.accent,
               fontSize: "12px",
               fontWeight: 600,
               letterSpacing: "2px",
@@ -208,7 +226,7 @@ export default function PromptEnhanceAnimation({
                   width: "16px",
                   height: "16px",
                   border: `2px solid ${COLORS.border}`,
-                  borderTop: `2px solid ${COLORS.cyan}`,
+                  borderTop: `2px solid ${COLORS.accent}`,
                   borderRadius: "50%",
                   animation: "spin 1s linear infinite",
                 }}
@@ -232,7 +250,7 @@ export default function PromptEnhanceAnimation({
               gap: "24px",
             }}
           >
-            {/* Cyan glow spinner */}
+            {/* voxGreen glow spinner */}
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -240,14 +258,14 @@ export default function PromptEnhanceAnimation({
                 width: "60px",
                 height: "60px",
                 border: `3px solid ${COLORS.border}`,
-                borderTop: `3px solid ${COLORS.cyan}`,
+                borderTop: `3px solid ${COLORS.accent}`,
                 borderRadius: "50%",
-                boxShadow: `0 0 20px ${COLORS.cyanGlow}`,
+                boxShadow: `0 0 20px ${COLORS.accentGlow}`,
               }}
             />
             <p
               style={{
-                color: COLORS.cyan,
+                color: COLORS.accent,
                 fontSize: "18px",
                 fontWeight: 600,
                 margin: 0,
@@ -269,7 +287,7 @@ export default function PromptEnhanceAnimation({
           >
             <p
               style={{
-                color: COLORS.cyan,
+                color: COLORS.accent,
                 fontSize: "12px",
                 textTransform: "uppercase",
                 letterSpacing: "2px",
@@ -293,7 +311,7 @@ export default function PromptEnhanceAnimation({
                 overflow: "hidden",
               }}
             >
-              {/* Subtle cyan glow on top edge */}
+              {/* voxGreen glow on top edge */}
               <div
                 style={{
                   position: "absolute",
@@ -301,8 +319,8 @@ export default function PromptEnhanceAnimation({
                   left: 0,
                   right: 0,
                   height: "2px",
-                  background: `linear-gradient(90deg, transparent, ${COLORS.cyan}, transparent)`,
-                  opacity: 0.5,
+                  background: `linear-gradient(90deg, transparent, ${COLORS.accent}, transparent)`,
+                  opacity: 0.6,
                 }}
               />
               
@@ -321,7 +339,7 @@ export default function PromptEnhanceAnimation({
                   animate={{ opacity: cursorVisible ? 1 : 0 }}
                   transition={{ duration: 0.1 }}
                   style={{
-                    color: COLORS.cyan,
+                    color: COLORS.accent,
                     fontWeight: 300,
                   }}
                 >
@@ -344,15 +362,15 @@ export default function PromptEnhanceAnimation({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
-                  background: `rgba(64, 197, 205, 0.15)`,
-                  color: COLORS.cyan,
+                  background: `rgba(59, 145, 141, 0.2)`,
+                  color: COLORS.accent,
                   padding: "10px 20px",
                   borderRadius: "24px",
                   fontSize: "13px",
                   fontWeight: 600,
                   letterSpacing: "0.5px",
-                  border: `1px solid rgba(64, 197, 205, 0.3)`,
-                  boxShadow: `0 0 20px ${COLORS.cyanGlow}`,
+                  border: `1px solid rgba(59, 145, 141, 0.4)`,
+                  boxShadow: `0 0 20px ${COLORS.accentGlow}`,
                 }}
               >
                 <span style={{ fontSize: "14px" }}>✨</span>
