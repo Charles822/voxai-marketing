@@ -15,7 +15,7 @@ const path = require('path');
 
   const page = await context.newPage();
 
-  // NEW PROMPTS - ACCELERATED (5 seconds total)
+  // NEW PROMPTS - Bard/Historian
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -233,7 +233,7 @@ const path = require('path');
     <div id="phase1" class="phase">
       <p class="label">Basic Prompt</p>
       <div class="input-box">
-        <h2 class="simple-text">"Mysterious hooded informant"</h2>
+        <h2 class="simple-text">"A Traveling bard historian"</h2>
       </div>
       <div class="waiting">
         <div class="waiting-spinner"></div>
@@ -261,20 +261,17 @@ const path = require('path');
   </div>
 
   <script>
-    const enhancedText = "A figure in an oversized, frayed charcoal linen hood casting deep facial shadows. Worn dark leather mantle, silver-toothed buckles, and dirt-smudged knuckles. Weathered burlap textures, muted obsidian fabrics, and a glint of a metallic emblem half-hidden beneath a heavy, tattered cloak.";
+    const enhancedText = "An elderly male minstrel with a long, braided salt-and-pepper beard, wearing a weathered wool cloak, leather jerkin, and quilted linen tunics. He carries a polished wooden lute on his back and a heavy, brass-clasped leather tome dangling from his woven hemp belt.";
     
     // ACCELERATED TIMING (5 seconds total)
-    // Phase 1: 0.8s (was 2s)
     setTimeout(() => {
       document.getElementById('phase1').style.display = 'none';
       document.getElementById('phase2').style.display = 'block';
       
-      // Phase 2: 0.4s (was 0.8s)
       setTimeout(() => {
         document.getElementById('phase2').style.display = 'none';
         document.getElementById('phase3').style.display = 'block';
         
-        // Phase 3: Type faster (18ms per char, was 30ms)
         let index = 0;
         const typingElement = document.getElementById('typed-text');
         
@@ -289,7 +286,7 @@ const path = require('path');
               document.getElementById('bottom-brand').style.opacity = '1';
             }, 200);
           }
-        }, 18); // Faster typing
+        }, 18);
         
       }, 400);
     }, 800);
@@ -302,7 +299,6 @@ const path = require('path');
   
   await page.goto('file://' + path.join(__dirname, 'record-temp.html'));
   
-  // SHORTER recording (5 seconds)
   console.log('⏱️  Recording animation (5 seconds)...');
   await page.waitForTimeout(5000);
   
@@ -316,11 +312,11 @@ const path = require('path');
   
   if (videoFile) {
     const oldPath = path.join(videoDir, videoFile);
-    const newPath = path.join(__dirname, 'prompt-enhancement.mp4');
+    const newPath = path.join(__dirname, 'prompt-enhancement-bard.mp4');
     fs.renameSync(oldPath, newPath);
     fs.unlinkSync('record-temp.html');
     fs.rmdirSync(videoDir);
     
-    console.log('✅ Video saved: prompt-enhancement.mp4');
+    console.log('✅ Video saved: prompt-enhancement-bard.mp4');
   }
 })();
