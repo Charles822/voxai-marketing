@@ -1,8 +1,24 @@
 const { chromium } = require('playwright');
 const path = require('path');
+const fs = require('fs');
+const { pathToFileURL } = require('url');
+
+// Accept image path as CLI arg, default to spell_scroll.png
+const imageArg = process.argv[2];
+const imagePath = imageArg
+  ? path.resolve(process.cwd(), imageArg)
+  : path.join(__dirname, 'public', 'spell_scroll.png');
+
+if (!fs.existsSync(imagePath)) {
+  console.error(`❌ Image not found: ${imagePath}`);
+  process.exit(1);
+}
+
+const imageUrl = pathToFileURL(imagePath).href;
 
 (async () => {
   console.log('🎬 Starting video recording (5 seconds)...');
+  console.log(`📷 Using image: ${imagePath}`);
   
   const browser = await chromium.launch();
   const context = await browser.newContext({
@@ -15,7 +31,7 @@ const path = require('path');
 
   const page = await context.newPage();
 
-  // HTML with 5-second animation (slower transitions)
+  // 9:16 format (540×960), image-driven animation
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -26,6 +42,7 @@ const path = require('path');
       --voxGreen-50: #f3faf8;
       --voxGreen-100: #d7f0ed;
       --voxGreen-300: #7fc9c2;
+      --voxGreen-400: #5ab5af;
       --voxGreen-500: #3b918d;
       --voxGreen-600: #2d7472;
       --voxGreen-700: #285d5d;
@@ -41,7 +58,7 @@ const path = require('path');
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       overflow: hidden;
     }
     .container {
@@ -56,7 +73,7 @@ const path = require('path');
     }
     .brand-header {
       position: absolute;
-      top: 50px;
+      top: 40px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -88,125 +105,141 @@ const path = require('path');
       transform: translate(-50%, -50%);
     }
     
-    /* Grid */
+    /* Phase 1: Grid of 4 reference images */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       width: 100%;
-      max-width: 320px;
+      max-width: 340px;
       margin: 0 auto;
     }
     .grid-item {
       aspect-ratio: 1;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--voxGreen-300);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid var(--voxGreen-800);
       transition: all 0.3s ease;
     }
-    
-    /* Selected image */
-    .selected-image {
-      width: 220px;
-      height: 220px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
+    .grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .grid-item.muted {
+      opacity: 0.5;
+      filter: brightness(0.7);
+    }
+    .grid {
+      perspective: 600px;
+      transform-style: preserve-3d;
+    }
+    .grid-item.selected {
+      border: 3px solid var(--voxGreen-500);
+      box-shadow: 0 0 24px rgba(59, 145, 141, 0.5);
+      animation: pulse-glow 1.2s ease-in-out infinite,
+                 selected-lift 0.4s ease-out forwards;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 24px rgba(59, 145, 141, 0.5); }
+      50% { box-shadow: 0 0 32px rgba(59, 145, 141, 0.7); }
+    }
+    @keyframes selected-lift {
+      0% { transform: translateZ(0) scale(1); }
+      100% { transform: translateZ(8px) scale(1.03); }
     }
     
-    /* Button */
+    /* Phase 2: Selected image prominent with 3D effects */
+    .selected-display {
+      width: 320px;
+      max-height: 480px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 3px solid var(--voxGreen-500);
+      box-shadow: 0 0 40px rgba(59, 145, 141, 0.4);
+      margin: 0 auto;
+      animation: selected-rotate-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                 selected-float-3d 2.5s ease-in-out 0.6s infinite;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .selected-display img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    @keyframes selected-rotate-in {
+      0% {
+        opacity: 0;
+        transform: perspective(1000px) rotateY(-28deg) scale(0.88);
+      }
+      100% {
+        opacity: 1;
+        transform: perspective(1000px) rotateY(0deg) scale(1);
+      }
+    }
+    @keyframes selected-float-3d {
+      0%, 100% { transform: perspective(1000px) rotateY(0deg) rotateX(-2deg); }
+      50% { transform: perspective(1000px) rotateY(2deg) rotateX(2deg); }
+    }
+    
+    /* Phase 3: Generate 3D button */
     .generate-btn {
       background: linear-gradient(135deg, var(--voxGreen-500), var(--voxGreen-600));
       color: var(--voxGreen-50);
-      padding: 16px 36px;
-      border-radius: 24px;
+      padding: 18px 40px;
+      border-radius: 28px;
       font-size: 18px;
       font-weight: 600;
       border: 1px solid var(--voxGreen-400);
       display: inline-block;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      box-shadow: 0 4px 20px rgba(59, 145, 141, 0.3);
+    }
+    .generate-btn.clicked {
+      transform: scale(0.92);
+      box-shadow: 0 2px 12px rgba(59, 145, 141, 0.4);
     }
     
-    /* Dialog */
-    .dialog {
-      background: var(--voxGreen-850);
-      border: 1px solid var(--voxGreen-800);
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    .dialog-title {
-      color: var(--voxGreen-100);
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .model-option {
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      font-size: 13px;
-      text-align: left;
-    }
-    .model-selected {
-      background: rgba(59, 145, 141, 0.2);
-      border: 2px solid var(--voxGreen-500);
-      color: var(--voxGreen-50);
-    }
-    .model-unselected {
-      background: var(--voxGreen-900);
-      border: 1px solid var(--voxGreen-800);
-      color: var(--voxGreen-100);
-      opacity: 0.5;
-    }
-    .generate-small {
-      margin-top: 16px;
-      background: var(--voxGreen-500);
-      color: var(--voxGreen-50);
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    
-    /* Loading */
+    /* Phase 4: Processing */
     .spinner {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       border: 4px solid var(--voxGreen-800);
       border-top: 4px solid var(--voxGreen-500);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 24px;
+    }
+    .phase4-text {
+      margin-top: 8px;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     
-    .status-text {
+    .status-bar {
       position: absolute;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
+      bottom: 120px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+    .status-text {
       color: var(--voxGreen-300);
       font-size: 12px;
       letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
     
     #phase1 { display: block; }
     #phase2 { display: none; }
     #phase3 { display: none; }
     #phase4 { display: none; }
-    #phase5 { display: none; }
   </style>
 </head>
 <body>
@@ -216,85 +249,88 @@ const path = require('path');
       <span class="brand-text">VoxAI Image to 3D</span>
     </div>
     
-    <!-- Phase 1: Grid -->
+    <!-- Phase 1: 4 reference images, one highlighted -->
     <div id="phase1" class="phase">
       <div class="grid">
-        <div class="grid-item" style="background: linear-gradient(135deg, #3b5a7c40, #3b5a7c20); border: 2px solid var(--voxGreen-800);">Image 1</div>
-        <div class="grid-item" style="background: linear-gradient(135deg, #5a3b7c40, #5a3b7c20); border: 2px solid var(--voxGreen-800);">Image 2</div>
-        <div class="grid-item" style="background: linear-gradient(135deg, #7c5a3b40, #7c5a3b20); border: 2px solid var(--voxGreen-800);">Image 3</div>
-        <div class="grid-item" style="background: linear-gradient(135deg, #3b918d40, #3b918d20); border: 2px solid #3b918d; box-shadow: 0 0 20px #3b918d60;">Image 4</div>
+        <div class="grid-item muted">
+          <img src="${imageUrl}" alt="Ref 1" />
+        </div>
+        <div class="grid-item muted">
+          <img src="${imageUrl}" alt="Ref 2" />
+        </div>
+        <div class="grid-item muted">
+          <img src="${imageUrl}" alt="Ref 3" />
+        </div>
+        <div class="grid-item selected">
+          <img src="${imageUrl}" alt="Selected" />
+        </div>
       </div>
-      <p class="status-text">Choose your reference image</p>
     </div>
     
-    <!-- Phase 2: Selected -->
+    <!-- Phase 2: Selected image full view -->
     <div id="phase2" class="phase">
-      <div class="selected-image" style="background: linear-gradient(135deg, #3b918d40, #3b918d20); border: 3px solid #3b918d; box-shadow: 0 0 40px #3b918d80;">
-        <span style="color: #f3faf8; font-size: 16px; font-weight: 500;">Selected</span>
+      <div class="selected-display">
+        <img src="${imageUrl}" alt="Selected for 3D" />
       </div>
-      <p class="status-text">Image selected</p>
     </div>
     
-    <!-- Phase 3: Button -->
+    <!-- Phase 3: Generate 3D button + click -->
     <div id="phase3" class="phase">
-      <div class="generate-btn">Generate 3D</div>
-      <p class="status-text">Click to start generation</p>
+      <div id="generateBtn" class="generate-btn">Generate 3D</div>
     </div>
     
-    <!-- Phase 4: Dialog -->
+    <!-- Phase 4: Processing -->
     <div id="phase4" class="phase">
-      <div class="dialog">
-        <p class="dialog-title">Select AI Model</p>
-        <div class="model-option model-selected">
-          <strong style="font-size: 14px;">VoxAI 3 (Beta)</strong><br/>
-          <span style="font-size: 11px; color: #7fc9c2;">4k Texture • Highest Detail • Cinematic Quality</span>
-        </div>
-        <div class="model-option model-unselected">
-          <strong style="font-size: 13px;">VoxAI 1</strong><br/>
-          <span style="font-size: 10px; color: #7fc9c2;">Fast • Production Ready</span>
-        </div>
-        <div class="generate-small">Generate 3D Model</div>
-      </div>
-      <p class="status-text">VoxAI 3 selected</p>
+      <div class="spinner"></div>
+      <p class="phase4-text" style="color: var(--voxGreen-500); font-size: 16px; font-weight: 600;">Generating 3D Model...</p>
     </div>
     
-    <!-- Phase 5: Loading -->
-    <div id="phase5" class="phase">
-      <div class="spinner"></div>
-      <p style="color: #3b918d; font-size: 16px; font-weight: 600;">Generating 3D Model...</p>
-      <p class="status-text">Processing with AI</p>
+    <div class="status-bar">
+      <p id="statusText" class="status-text">Choose your reference image</p>
     </div>
   </div>
 
   <script>
-    // 5-second timing (slower, more readable)
+    const statusEl = document.getElementById('statusText');
+    function setStatus(text) { statusEl.textContent = text; }
+    
+    // 5-second flow: Grid -> Selected -> Button+Click -> Processing
     setTimeout(() => {
       document.getElementById('phase1').style.display = 'none';
       document.getElementById('phase2').style.display = 'block';
-    }, 800);
+      setStatus('Image selected');
+    }, 1000);
     
     setTimeout(() => {
       document.getElementById('phase2').style.display = 'none';
       document.getElementById('phase3').style.display = 'block';
-    }, 1600);
+      setStatus('Tap to transform');
+    }, 2100);
     
+    // Simulate click on Generate 3D at ~2.6s
     setTimeout(() => {
+      const btn = document.getElementById('generateBtn');
+      btn.classList.add('clicked');
+    }, 2600);
+    setTimeout(() => {
+      const btn = document.getElementById('generateBtn');
+      btn.classList.remove('clicked');
       document.getElementById('phase3').style.display = 'none';
       document.getElementById('phase4').style.display = 'block';
-    }, 2400);
-    
-    setTimeout(() => {
-      document.getElementById('phase4').style.display = 'none';
-      document.getElementById('phase5').style.display = 'block';
-    }, 3600);
+      setStatus('Processing with AI');
+    }, 2850);
   </script>
 </body>
 </html>
   `;
   
-  require('fs').writeFileSync('record-temp.html', htmlContent);
+  fs.writeFileSync(path.join(__dirname, 'record-temp.html'), htmlContent);
   
   await page.goto('file://' + path.join(__dirname, 'record-temp.html'));
+  
+  // Wait for image to load before recording
+  await page.waitForSelector('.grid-item img', { state: 'visible', timeout: 5000 });
+  await page.waitForTimeout(200);
   
   console.log('⏱️  Recording animation (5 seconds)...');
   await page.waitForTimeout(5000);
@@ -302,17 +338,16 @@ const path = require('path');
   await context.close();
   await browser.close();
   
-  const fs = require('fs');
-  const videoDir = 'videos/';
-  const files = fs.readdirSync(videoDir);
+  const videoDir = path.join(__dirname, 'videos');
+  const files = fs.existsSync(videoDir) ? fs.readdirSync(videoDir) : [];
   const videoFile = files.find(f => f.endsWith('.webm'));
   
   if (videoFile) {
     const oldPath = path.join(videoDir, videoFile);
     const newPath = path.join(__dirname, 'image-to-3d-transition-5s.mp4');
     fs.renameSync(oldPath, newPath);
-    fs.unlinkSync('record-temp.html');
-    fs.rmdirSync(videoDir);
+    fs.unlinkSync(path.join(__dirname, 'record-temp.html'));
+    try { fs.rmdirSync(videoDir); } catch (_) {}
     
     console.log('✅ Video saved: image-to-3d-transition-5s.mp4');
   }
