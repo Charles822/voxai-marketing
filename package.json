@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "record:5s": "node record-video-5s.js"
+    "record:5s": "node record-video-5s.js",
+    "record:prompt-enhance": "node record-prompt-enhance.js"
   },
   "dependencies": {
     "@playwright/test": "^1.58.2",
