@@ -15,7 +15,7 @@ const path = require('path');
 
   const page = await context.newPage();
 
-  // NEW PROMPTS - Bard/Historian
+  // NEW PROMPTS - Spell Scroll
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -233,7 +233,7 @@ const path = require('path');
     <div id="phase1" class="phase">
       <p class="label">Basic Prompt</p>
       <div class="input-box">
-        <h2 class="simple-text">"A Traveling bard historian"</h2>
+        <h2 class="simple-text">"Tattered Spell Scroll"</h2>
       </div>
       <div class="waiting">
         <div class="waiting-spinner"></div>
@@ -261,9 +261,8 @@ const path = require('path');
   </div>
 
   <script>
-    const enhancedText = "An elderly male minstrel with a long, braided salt-and-pepper beard, wearing a weathered wool cloak, leather jerkin, and quilted linen tunics. He carries a polished wooden lute on his back and a heavy, brass-clasped leather tome dangling from his woven hemp belt.";
+    const enhancedText = "Ancient, yellowed parchment scroll with frayed, burnt edges and deep creases. Glowing violet runic inscriptions etched in shimmering metallic ink. Held by cracked wooden rollers with tarnished bronze endcaps. Stained with faded ink spatters and dust, showing rough, weathered fiber texture.";
     
-    // ACCELERATED TIMING (5 seconds total)
     setTimeout(() => {
       document.getElementById('phase1').style.display = 'none';
       document.getElementById('phase2').style.display = 'block';
@@ -312,11 +311,11 @@ const path = require('path');
   
   if (videoFile) {
     const oldPath = path.join(videoDir, videoFile);
-    const newPath = path.join(__dirname, 'prompt-enhancement-bard.mp4');
+    const newPath = path.join(__dirname, 'prompt-enhancement-scroll.mp4');
     fs.renameSync(oldPath, newPath);
     fs.unlinkSync('record-temp.html');
     fs.rmdirSync(videoDir);
     
-    console.log('✅ Video saved: prompt-enhancement-bard.mp4');
+    console.log('✅ Video saved: prompt-enhancement-scroll.mp4');
   }
 })();
