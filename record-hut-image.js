@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 (async () => {
-  console.log('🎬 Recording Cultist Image-to-3D (improved 4-phase)...');
+  console.log('🎬 Recording Hut Image-to-3D (improved 4-phase)...');
   
   const browser = await chromium.launch();
   const context = await browser.newContext({
@@ -16,7 +16,7 @@ const fs = require('fs');
 
   const page = await context.newPage();
 
-  const imagePath = path.join(__dirname, 'user-image-cultist.jpg');
+  const imagePath = path.join(__dirname, 'user-image-hut.jpg');
   const imageUrl = 'file://' + imagePath.replace(/\\/g, '/');
   
   const htmlContent = `<!DOCTYPE html>
@@ -182,11 +182,11 @@ const fs = require('fs');
   
   if (videoFile) {
     const oldPath = path.join(videoDir, videoFile);
-    const newPath = path.join(__dirname, 'image-to-3d-cultist.mp4');
+    const newPath = path.join(__dirname, 'image-to-3d-hut.mp4');
     fs.renameSync(oldPath, newPath);
     fs.unlinkSync(path.join(__dirname, 'record-temp.html'));
     if (fs.existsSync(videoDir)) fs.rmdirSync(videoDir);
     
-    console.log('✅ Video saved: image-to-3d-cultist.mp4');
+    console.log('✅ Video saved: image-to-3d-hut.mp4');
   }
 })();
